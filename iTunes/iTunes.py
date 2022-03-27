@@ -47,3 +47,37 @@ def findDuplicates(fileName):
         for val in dups:
             f.write('[%d] %s\n' %[val[0],val[1]])
         f.close()
+
+def findCommonTracks(fileNames):
+    # a list of sets of track names
+    trackNameSets = []
+    for fileName in fileNames:
+        # create a new set
+        trackNames = set()
+        # read in playlist
+        plist = plistlib.readPlist(fileName)
+        # get the tracks
+        tracks = plist['Tracks']
+        # iterate through the tracks
+        for trackId, track in tracks.items():
+            try:
+                # add the rack name to a set
+                trackNames.add(track['Name'])
+            except:
+                # ignore
+                pass
+    # add to list
+    trackNameSets.append(trackNames) # 这一句是否要包含在for fileName in fileNames中
+    print('*trackNameSets:',*trackNameSets)
+    # get the set of common tracks
+    commonTracks = set.intersection(*trackNameSets) # intersection() 方法用于返回两个或更多集合中都包含的元素，即交集
+    # write to file
+    if len(commonTracks) > 0: # alternative: if commonTracks
+        f = open("common.txt",'w')
+        for val in commonTracks:
+            s = "%s\n" % val
+            f.write(s.encode("UTF-8"))
+        f.close()
+        print("%d common tracks found. Track names weitten to common.txt." % len(commonTracks))
+    else:
+        print("No common tracks!")
