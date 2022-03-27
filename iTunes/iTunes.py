@@ -1,5 +1,6 @@
-from fileinput import filename
 import plistlib
+import numpy as np
+import matplotlib as pyplot
 
 def findDuplicates(fileName):
     print('Finding duplicate tracks in %s...' % fileName)
@@ -99,5 +100,25 @@ def plotStats(fileName):
             pass
     # ensure that valid data was collected
     if ratings ==[] or durations == []:
-        print('No valid Album Rating/Total Time data in %s.' %filename)
+        print('No valid Album Rating/Total Time data in %s.' %fileName)
         return
+
+    # scatter plot
+    x = np.array[durations,np.inte32]
+    # covert to minutes
+    x = x/60000.0
+    y = np.array(ratings,np.int32)
+    pyplot.subplot(2,1,1)
+    pyplot.plot(x,y,'o')
+    pyplot.axis([0,1.05*np.max(x),-1,110]) # axis( [xmin xmax ymin ymax] )    设置当前坐标轴 x轴 和 y轴的限制范围
+    pyplot.xlabel('Track duration')
+    pyplot.ylabel('Track rating')
+
+    # plot histogram
+    pyplot.subplot(2,1,2)
+    pyplot.hist(x,bins=20) # 在x最小值和最大值中间分成20份
+    pyplot.xlabel('Track duration')
+    pyplot.ylabel('Count')
+
+    # show plot
+    pyplot.show()
