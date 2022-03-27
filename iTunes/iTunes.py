@@ -1,12 +1,14 @@
+import argparse
 import plistlib
 import numpy as np
-import matplotlib as pyplot
+import matplotlib.pyplot as pyplot
 
 def findDuplicates(fileName):
     print('Finding duplicate tracks in %s...' % fileName)
     # read in a playlist
-    plist = plistlib.readPlist(fileName)
-    print("plist['Tracks']:",plist['Tracks'])
+    with open(r'D:\Python\PlayGround\PlayGroundCode\iTunes\test-data'+ '\\' + fileName,'r') as f:
+        plist = plistlib.load(f)
+    # print("plist['Tracks']:",plist['Tracks'])
     # get the tracks from the Tracks dictionary
     tracks = plist['Tracks']
     # create a track name dictionary,save duplicate tracks
@@ -50,13 +52,20 @@ def findDuplicates(fileName):
         f.close()
 
 def findCommonTracks(fileNames):
+    """
+    Find common tracks in given playlist files,
+    and save them to common.txt
+    """
     # a list of sets of track names
     trackNameSets = []
     for fileName in fileNames:
         # create a new set
         trackNames = set()
+        # print('fileName:',fileName)
+        # fileName = dict(fileName)
         # read in playlist
-        plist = plistlib.readPlist(fileName)
+        with open(r'D:\Python\PlayGround\PlayGroundCode\iTunes\test-data'+ '\\' + fileName,'rb') as f:
+            plist = plistlib.load(f)
         # get the tracks
         tracks = plist['Tracks']
         # iterate through the tracks
@@ -69,7 +78,7 @@ def findCommonTracks(fileNames):
                 pass
     # add to list
     trackNameSets.append(trackNames) # 这一句是否要包含在for fileName in fileNames中
-    print('*trackNameSets:',*trackNameSets)
+    # print('*trackNameSets:',*trackNameSets)
     # get the set of common tracks
     commonTracks = set.intersection(*trackNameSets) # intersection() 方法用于返回两个或更多集合中都包含的元素，即交集
     # write to file
@@ -77,15 +86,19 @@ def findCommonTracks(fileNames):
         f = open("common.txt",'w')
         for val in commonTracks:
             s = "%s\n" % val
-            f.write(s.encode("UTF-8"))
+            f.write(s)
         f.close()
         print("%d common tracks found. Track names weitten to common.txt." % len(commonTracks))
     else:
         print("No common tracks!")
 
 def plotStats(fileName):
+    """
+    Plot some statistics by reading track information from playlist
+    """
     # read in a playlist
-    plist = plistlib.readPlist(fileName)
+    with open(r'D:\Python\PlayGround\PlayGroundCode\iTunes\test-data'+ '\\' + fileName,'rb') as f:
+        plist = plistlib.load(f)
     # get the racks from the playlist
     tracks = plist['Tracks']
     ratings = []
@@ -104,7 +117,7 @@ def plotStats(fileName):
         return
 
     # scatter plot
-    x = np.array[durations,np.inte32]
+    x = np.array(durations,np.int32)
     # covert to minutes
     x = x/60000.0
     y = np.array(ratings,np.int32)
@@ -122,3 +135,35 @@ def plotStats(fileName):
 
     # show plot
     pyplot.show()
+
+def main():
+    # create parser
+    descStr = """
+    This program analyzes playlist files (.xml) exported from iTunes
+    """
+    parser = argparse.ArgumentParser(description = descStr)
+    # add a mutually exclusive group of arguments
+    group = parser.add_mutually_exclusive_group()
+
+    # add expected arguments
+    group.add_argument('--common',nargs='*',dest='plFiles',required=False)
+    group.add_argument('--stats',dest='plFile',required=False)
+    group.add_argument('--dup',dest='plFileD',required=False)
+
+    # parse args
+    args = parser.parse_args()
+
+    if args.plFiles:
+        # find common tracks
+        findCommonTracks(args.plFiles)
+    elif args.plFile:
+        # plot stats
+        plotStats(args.plFile)
+    elif args.plFileD:
+        # find duplicate tracks
+        findDuplicates(args.plFileD)
+    else:
+        print('These are not the tracks you are looking for.')
+
+if __name__ == '__main__':
+    main()
