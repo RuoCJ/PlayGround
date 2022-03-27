@@ -129,7 +129,8 @@ def plotStats(fileName):
 
     # plot histogram
     pyplot.subplot(2,1,2)
-    pyplot.hist(x,bins=20) # 在x最小值和最大值中间分成20份
+    # pyplot.hist(x,bins=20) # 在x最小值和最大值中间分成20份
+    pyplot.bar(x,y,width=0.05)
     pyplot.xlabel('Track duration')
     pyplot.ylabel('Count')
 
