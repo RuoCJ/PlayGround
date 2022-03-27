@@ -81,3 +81,23 @@ def findCommonTracks(fileNames):
         print("%d common tracks found. Track names weitten to common.txt." % len(commonTracks))
     else:
         print("No common tracks!")
+
+def plotStats(fileName):
+    # read in a playlist
+    plist = plistlib.readPlist(fileName)
+    # get the racks from the playlist
+    tracks = plist['Tracks']
+    ratings = []
+    durations = []
+    # iterate through the tracks
+    for trackId,track in tracks.items():
+        try:
+            ratings.append(track['Album Rating'])
+            durations.append(track['Total Time'])
+        except:
+            # ignore
+            pass
+    # ensure that valid data was collected
+    if ratings ==[] or durations == []:
+        print('No valid Album Rating/Total Time data in %s.' %filename)
+        return
